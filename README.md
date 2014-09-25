@@ -12,5 +12,4 @@ This is a command line tool for converting doctrine entities into Typescript (.t
 
 * convert doctrine entities to typescript classes.
 * recognize type of the doctrine entities, based upon the file ending of the files in the directory (yml,php are supported sofar)
-* 
 * default locations are set
