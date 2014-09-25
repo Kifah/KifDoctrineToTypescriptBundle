@@ -1,0 +1,7 @@
+parameters:
+#    kif_doctrine_to_typescript.example.class: Kif\DoctrineToTypescriptBundle\Example
+
+services:
+#    kif_doctrine_to_typescript.example:
+#        class: %kif_doctrine_to_typescript.example.class%
+#        arguments: [@service_id, "plain_value", %parameter%]
