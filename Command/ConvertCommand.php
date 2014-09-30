@@ -4,12 +4,12 @@
 namespace Kif\DoctrineToTypescriptBundle\Command;
 
 
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
+use Kif\DoctrineToTypescriptBundle\Service\EntityIterator;
+use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class ConvertCommand extends Command
+class ConvertCommand extends ContainerAwareCommand
 {
 
 
@@ -20,12 +20,7 @@ class ConvertCommand extends Command
     {
         $this
             ->setName('kif:doctrine:typescript:generate')
-            ->setDescription('Convert doctrine entities into Typescript classes')
-            ->addArgument(
-                'source',
-                InputArgument::REQUIRED,
-                'Where are the source entities?'
-            );
+            ->setDescription('Convert doctrine entities into Typescript classes');
     }
 
     /**
@@ -35,15 +30,11 @@ class ConvertCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $source = $input->getArgument('source');
-        if (!$source) {
-            $text = 'You have to type the source folder of your entities';
-        } else {
-            $output->writeln('<info>Generating Typescript....</info>');
-            $text = $source;
-        }
-
-
-        $output->writeln($text);
+        $em = $this->getContainer()->get('doctrine.orm.default_entity_manager');
+        $output->writeln('<info>Generating Typescript....</info>');
+        $directoryIterator = new EntityIterator($em);
+        $directoryIterator->directoryIterator();
     }
+
+
 }
