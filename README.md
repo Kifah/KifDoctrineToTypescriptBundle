@@ -15,7 +15,9 @@ This is a command line tool for converting doctrine entities into Typescript (.t
 
 
 ##Todo
-* set a --destination parameter which changes the default destination folder
-* set a --exposed-only, which would make sure jms serializer is installed, and generate only exposed entities or/and variables.
-
+* set a <code>--destination</code> parameter which changes the default destination folder
+* set a <code>--exposed-only</code> option, which would make sure jms serializer is installed, 
+and generate only exposed entities or/and variables.
+* set a <code>--single-file</code> option to a generate all models in a single .ts/js file. 
+This should stop the bundle-to-folder mechanism. The name of the generated file would be simply "models.ts"
 

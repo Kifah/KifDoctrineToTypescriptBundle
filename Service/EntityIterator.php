@@ -22,7 +22,7 @@ class EntityIterator
 
     }
 
-    public function directoryIterator()
+    public function directoryIterator($exposedOnly=false,$singleFile=false)
     {
         /**
          * @var $singleMeta ClassMetadata
@@ -51,11 +51,11 @@ class EntityIterator
     {
 
         $reflectionStuff = new \ReflectionClass($classMetadata->getName());
+        var_dump($classMetadata);die();
 
         $name = $reflectionStuff->getShortName();
         $namespace=str_replace("\\","",$reflectionStuff->getNamespaceName());
         $fields = $classMetadata->getFieldNames();
-        //$password = $classMetadata->getFieldMapping(pa)
         $file = 'generated/'.$name.'.ts';
         $content="module $namespace {\n\r";
         $content.="export class $name {\n\r";

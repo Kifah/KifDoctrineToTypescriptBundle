@@ -7,7 +7,9 @@ namespace Kif\DoctrineToTypescriptBundle\Command;
 use Kif\DoctrineToTypescriptBundle\Service\EntityIterator;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 
 class ConvertCommand extends ContainerAwareCommand
 {
@@ -20,7 +22,14 @@ class ConvertCommand extends ContainerAwareCommand
     {
         $this
             ->setName('kif:doctrine:typescript:generate')
-            ->setDescription('Convert doctrine entities into Typescript classes');
+            ->setDescription('Convert doctrine entities into Typescript classes')
+            ->addOption(
+                'exposed-only',
+                null,
+                InputOption::VALUE_NONE,
+                'If set, only exposed entites/variables will be generated'
+            );
+
     }
 
     /**
@@ -30,10 +39,23 @@ class ConvertCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $exposedOnly = false;
+        if ($input->getOption('exposed-only')) {
+            $output->writeln('<info>Generating only exposed entities....</info>');
+            if (!$this->getContainer()->has('jms_serializer')) {
+                throw new ServiceNotFoundException(
+                    'install the jms serializer bundle to use the --exposed-only option'
+                );
+            }
+            $exposedOnly = true;
+        }
+
         $em = $this->getContainer()->get('doctrine.orm.default_entity_manager');
         $output->writeln('<info>Generating Typescript....</info>');
         $directoryIterator = new EntityIterator($em);
-        $directoryIterator->directoryIterator();
+        $directoryIterator->directoryIterator($exposedOnly);
+
+
     }
 
 
