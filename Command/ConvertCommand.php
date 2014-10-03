@@ -52,8 +52,8 @@ class ConvertCommand extends ContainerAwareCommand
 
         $em = $this->getContainer()->get('doctrine.orm.default_entity_manager');
         $output->writeln('<info>Generating Typescript....</info>');
-        $directoryIterator = new EntityIterator($em);
-        $directoryIterator->directoryIterator($exposedOnly);
+        $entityIterator = new EntityIterator($em, $exposedOnly);
+        $entityIterator->entityBundlesIterator();
 
 
     }

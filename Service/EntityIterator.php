@@ -3,8 +3,12 @@
 
 namespace Kif\DoctrineToTypescriptBundle\Service;
 
+use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use JMS\Serializer\Annotation\Exclude;
+use JMS\Serializer\Annotation\ExclusionPolicy;
+use JMS\Serializer\Annotation\Expose;
 use ReflectionClass;
 
 class EntityIterator
@@ -16,21 +20,32 @@ class EntityIterator
      */
     private $em;
 
-    public function __construct(EntityManager $em)
+    /**
+     * @var bool
+     */
+    private $serializerExposedOnly;
+
+    /**
+     * @var bool
+     */
+    private $singleFile;
+
+    public function __construct(EntityManager $em, $serializerExposedOnly = false, $singleFile = false)
     {
         $this->em = $em;
+        $this->serializerExposedOnly = $serializerExposedOnly;
+        $this->singleFile = $singleFile;
 
     }
 
-    public function directoryIterator($exposedOnly=false,$singleFile=false)
+    public function entityBundlesIterator()
     {
         /**
          * @var $singleMeta ClassMetadata
          */
         $allMeta = $this->em->getMetadataFactory()->getAllMetadata();
         foreach ($allMeta as $singleMeta) {
-            $metData = $this->em->getClassMetadata($singleMeta->getName());
-            $this->typeScriptCreator($metData);
+            $this->handleSerializerExposed($singleMeta);
             $entities[] = $singleMeta->getName();
         }
 
@@ -41,64 +56,99 @@ class EntityIterator
      * this would be called from another ts file like this
      * this ///<reference path="Account.ts"/>
      * var account = new KifCrawlBundleEntity.Account();
-     * account.email="faswa";
+     * account.email="email@mycompany.com";
      * alert(account.email);
      * @param ClassMetadata $classMetadata
      * @throws \Doctrine\ORM\Mapping\MappingException
      */
     //@Todo cleanup code, add option of excluding bundle, or making this for exposed fields/entities only
-    protected function  typeScriptCreator(ClassMetadata $classMetadata)
+    protected function  typeScriptCreator(ClassMetadata $classMetadata, $excludedFields = [])
     {
 
         $reflectionStuff = new \ReflectionClass($classMetadata->getName());
-        var_dump($classMetadata);die();
-
         $name = $reflectionStuff->getShortName();
-        $namespace=str_replace("\\","",$reflectionStuff->getNamespaceName());
+        $namespace = str_replace("\\", "", $reflectionStuff->getNamespaceName());
         $fields = $classMetadata->getFieldNames();
-        $file = 'generated/'.$name.'.ts';
-        $content="module $namespace {\n\r";
-        $content.="export class $name {\n\r";
+        $file = 'generated/' . $name . '.ts';
+        $content = "module $namespace {\n\r";
+        $content .= "export class $name {\n\r";
 
 
+        foreach ($fields as $field) {
+            if (!in_array($field, $excludedFields)) {
+                $fielType = $this->typeConverter($classMetadata->getFieldMapping($field)['type']);
+                $content .= "private _$field$fielType ;\n\r";
+                $content .= "get $field(){\n\r";
+                $content .= "return  this._$field;\n\r";
+                $content .= "}\n\r";
+                $content .= "set $field(_$field$fielType){\n\r";
+                $content .= "this._$field=_$field;\n\r";
+                $content .= "}\n\r";
 
-        foreach($fields as $field){
-            $fielType=$this->typeConverter($classMetadata->getFieldMapping($field)['type']);
-            $content.="private _$field$fielType ;\n\r";
-            $content.="get $field(){\n\r";
-            $content.="return  this._$field;\n\r";
-            $content.="}\n\r";
-            $content.="set $field(_$field$fielType){\n\r";
-            $content.="this._$field=_$field;\n\r";
-            $content.="}\n\r";
+            }
 
 
         }
-        $content.="}\n\r";
-        $content.="}";
-        file_put_contents($file,$content);
+        $content .= "}\n\r";
+        $content .= "}";
+        echo $content;
+        //file_put_contents($file,$content);
 
     }
 
-    protected function typeConverter($type) {
+    protected function typeConverter($type)
+    {
 
         switch ($type) {
             case "integer":
-                return  ":number";
+                return ":number";
                 break;
             case "smallint":
-                return  ":number";
+                return ":number";
                 break;
             case "datetime":
-                return  ":Date";
+                return ":Date";
                 break;
             case "array":
-                return  ":Array<string>";
+                return ":Array<string>";
                 break;
             default:
-                return ":".$type;
+                return ":" . $type;
         }
 
+    }
+
+    /**
+     * @param $singleMeta
+     * @param $metData
+     */
+    protected function handleSerializerExposed(ClassMetadata $singleMeta)
+    {
+        $excludedFields = [];
+        $fields = $singleMeta->getFieldNames();
+        $annotationReader = new AnnotationReader();
+        $classAnnotation = $annotationReader->getClassAnnotation(
+            $singleMeta->getReflectionClass(),
+            ExclusionPolicy::class
+        );
+        if ($classAnnotation) {
+            $exclusionPolicy = $classAnnotation->policy;
+            if ($exclusionPolicy == 'ALL') {
+                //filter out the exposed fields only
+                foreach ($fields as $field) {
+                    $property = $singleMeta->getReflectionProperty($field);
+                    $exposeAnnotation = $annotationReader->getPropertyAnnotation($property, Expose::class);
+                    $excludeAnnotation = $annotationReader->getPropertyAnnotation($property, Exclude::class);
+                    if (($exposeAnnotation == null && $exclusionPolicy == 'ALL') || ($exclusionPolicy == 'NONE' && $excludeAnnotation != null)) {
+                        $excludedFields[] = $field;
+                    }
+
+                }
+
+            }
+        }
+
+        $this->typeScriptCreator($singleMeta, $excludedFields);
     }
 
 }
