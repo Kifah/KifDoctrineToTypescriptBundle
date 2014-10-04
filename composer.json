@@ -2,7 +2,12 @@
     "name": "kif/doctrine_typescript_bundle",
     "type": "symfony-bundle",
     "description": "convert doctrine entities into typescript classes",
-    "keywords": ["symfony2", "cli", "typescript", "doctrine"],
+    "keywords": [
+        "symfony2",
+        "cli",
+        "typescript",
+        "doctrine"
+    ],
     "homepage": "https://github.com/Kifah/KifDoctrineToTypescriptBundle",
     "license": "MIT",
     "authors": [
@@ -15,7 +20,9 @@
     ],
     "require": {
         "php": ">=5.5.0",
-        "symfony/symfony": "~2.1"
+        "symfony/symfony": "~2.1",
+        "jms/serializer-bundle": "0.13.*@dev"
+
     },
     "minimum-stability": "stable",
     "prefer-stable": true,
