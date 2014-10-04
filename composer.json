@@ -19,7 +19,7 @@
         }
     ],
     "require": {
-        "php": ">=5.5.0",
+        "php": ">=5.4.0",
         "symfony/symfony": "~2.1",
         "jms/serializer-bundle": "0.13.*@dev"
 
