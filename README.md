@@ -29,8 +29,12 @@ in your javascript part of the project, without needed to write the code for it.
 
 ##Usage
 
-
-
+* in your symfony folder use the command
+<code>
+<strong>php app/console kif:doctrine:typescript:generate destination_folder</strong>
+</code>
+This would generate a folder <code>/models/</code> in the given destination folder, with Typescript files containing all the models
+represented in your symfony project as doctrine entities
 
 
 
