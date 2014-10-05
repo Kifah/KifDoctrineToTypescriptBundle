@@ -14,12 +14,11 @@ in your javascript part of the project, without needed to write the code for it.
 
 ##Installation
 
-* add the following line into your symfony2.2+ <code>composer.json</code> file
-<br>
-<code>
-        "kif/doctrine_typescript_bundle": "dev-master"
-</code>
-* run <code>composer.phar update</code>
+``` bash
+$ php composer.phar require kif/doctrine_typescript_bundle 'dev-master'
+```
+
+
 * activate the bundle into your <code>app/AppKernel.php</code> file
 <br>
 <code>
