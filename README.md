@@ -153,7 +153,7 @@ alert(contact.nickName);
 ###Usage with option <code>--exposed-only</code>
 
 <strong>Important:</strong> For this to work correctly, you need to have the 
-[JMS Serialzer Bundle](https://github.com/schmittjoh/JMSSerializerBundle) installed correctly
+[JMS Serialzer Bundle](https://github.com/schmittjoh/JMSSerializerBundle) installed correctly.
 
 There are cases, where you want to generate only Entites and fields, that are exposed by the JMS serializer,
 because you want to keep the rest private or hidden from other parts of your project.
@@ -208,6 +208,9 @@ this._nickName=_nickName;
 ```
 
 Notice how only the field <code>$nickName</code> was generated ,while the rest was ignored. (hidden)
+
+Also note that only entites where <code>@ExclusionPolicy</code> is set as (none or all) are generated. So entites without this
+annotation get automatically recognized as <code>@ExclusionPolicy(all)</code> and get completey ignored by the generator
 
 
 ##Todo
