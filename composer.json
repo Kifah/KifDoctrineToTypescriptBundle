@@ -20,7 +20,10 @@
     ],
     "require": {
         "php": ">=5.4.0",
-        "symfony/symfony": "~2.1",
+        "symfony/symfony": "~2.1"
+
+    },
+    "require-dev": {
         "jms/serializer-bundle": "0.13.*@dev",
         "mikey179/vfsStream": "1.4.*@dev"
 
