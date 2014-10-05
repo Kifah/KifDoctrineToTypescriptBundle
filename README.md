@@ -19,7 +19,7 @@ $ php composer.phar require kif/doctrine_typescript_bundle 'dev-master'
 ```
 
 
-* activate the bundle into your <code>app/AppKernel.php</code> file
+* activate the bundle in your <code>app/AppKernel.php</code> file
 <br>
 
 ``` php
@@ -39,9 +39,12 @@ public function registerBundles()
 ##Usage
 
 * in your symfony folder use the command
-<code>
-<strong>php app/console kif:doctrine:typescript:generate destination_folder</strong>
-</code>
+
+
+``` bash
+$ php app/console kif:doctrine:typescript:generate destination_folder
+```
+
 This would generate a folder <code>/models/</code> in the given destination folder, with Typescript files containing all the models
 represented in your symfony project as doctrine entities
 
