@@ -21,9 +21,19 @@ $ php composer.phar require kif/doctrine_typescript_bundle 'dev-master'
 
 * activate the bundle into your <code>app/AppKernel.php</code> file
 <br>
-<code>
+
+``` php
+<?php
+// app/AppKernel.php
+
+public function registerBundles()
+{
+    $bundles = array(
+        // ...
             new Kif\DoctrineToTypescriptBundle\KifDoctrineToTypescriptBundle(),
-</code>
+    );
+}
+```
 
 
 ##Usage
