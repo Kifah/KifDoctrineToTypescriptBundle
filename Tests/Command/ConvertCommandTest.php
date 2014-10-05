@@ -6,7 +6,6 @@ namespace Kif\DoctrineToTypescriptBundle\Command;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
-use Kif\DoctrineToTypescriptBundle\Command\ConvertCommand;
 
 class ConvertCommandTest extends KernelTestCase
 {
@@ -32,8 +31,7 @@ class ConvertCommandTest extends KernelTestCase
         self::bootKernel();
         $this->em = static::$kernel->getContainer()
             ->get('doctrine')
-            ->getManager()
-        ;
+            ->getManager();
 
     }
 
