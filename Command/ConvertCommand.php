@@ -4,16 +4,31 @@
 namespace Kif\DoctrineToTypescriptBundle\Command;
 
 
+use Doctrine\ORM\EntityManager;
+use JMS\Serializer\Serializer;
 use Kif\DoctrineToTypescriptBundle\Service\EntityIterator;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
+use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 
-class ConvertCommand extends ContainerAwareCommand
+class ConvertCommand extends Command
 {
+
+    private $allMetaData;
+
+    private $serialzer;
+
+    public function __construct(EntityManager $entityManager, Serializer $serializer = null)
+    {
+        $this->allMetaData = $entityManager->getMetadataFactory()->getAllMetadata();
+        $this->serialzer = $serializer;
+        parent::__construct();
+
+    }
 
 
     /**
@@ -41,12 +56,21 @@ class ConvertCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $destinationFolder =$input->getArgument('destination_folder');
+        $destinationFolder = $input->getArgument('destination_folder');
         $exposedOnly = false;
-        $generateSingleFile  = false;
+        $generateSingleFile = false;
+
+
+        if (!file_exists($destinationFolder)) {
+            throw new FileNotFoundException(
+                'The destination folder does not exist.'
+            );
+        }
+
+
         if ($input->getOption('exposed-only')) {
             $output->writeln('<info>Generating only exposed entities....</info>');
-            if (!$this->getContainer()->has('jms_serializer')) {
+            if ($this->serialzer == null) {
                 throw new ServiceNotFoundException(
                     'install the jms serializer bundle to use the --exposed-only option'
                 );
@@ -54,9 +78,8 @@ class ConvertCommand extends ContainerAwareCommand
             $exposedOnly = true;
         }
 
-        $em = $this->getContainer()->get('doctrine.orm.default_entity_manager');
         $output->writeln('<info>Generating Typescript....</info>');
-        $entityIterator = new EntityIterator($em, $destinationFolder,$exposedOnly,$generateSingleFile);
+        $entityIterator = new EntityIterator($this->allMetaData, $destinationFolder, $exposedOnly, $generateSingleFile);
         $entityIterator->entityBundlesIterator();
 
 
