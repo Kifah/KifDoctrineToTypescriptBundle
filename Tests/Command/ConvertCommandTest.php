@@ -16,6 +16,14 @@ class ConvertCommandTest extends KernelTestCase
      */
     private $em;
 
+
+    /**
+     * root directory
+     *
+     * @type  vfsStreamDirectory
+     */
+    protected $root;
+
     /**
      * {@inheritDoc}
      */
@@ -26,6 +34,7 @@ class ConvertCommandTest extends KernelTestCase
             ->get('doctrine')
             ->getManager()
         ;
+
     }
 
 
@@ -62,28 +71,5 @@ class ConvertCommandTest extends KernelTestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function executeCorrectlyStandard()
-    {
-        $application = new Application();
-        $application->add(new ConvertCommand($this->em));
 
-        $command = $application->find('kif:doctrine:typescript:generate');
-        $commandTester = new CommandTester($command);
-        $commandTester->execute(
-            array('command' => $command->getName(), 'destination_folder' => 'my_test_folder/')
-        );
-    }
-
-
-
-    /**
-     * {@inheritDoc}
-     */
-    protected function tearDown()
-    {
-        parent::tearDown();
-    }
 }
