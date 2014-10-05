@@ -150,13 +150,15 @@ alert(contact.nickName);
 ```
 
 
+###Usage with option <code>--exposed-only</code>
+
+<strong>Important:</strong> For this to work correctly, you need to have the 
+[JMS Serialzer Bundle](https://github.com/schmittjoh/JMSSerializerBundle) installed correctly
 
 
 
 
 ##Todo
-* set a <code>--destination</code> parameter which changes the default destination folder
-and generate only exposed entities or/and variables.
 * set a <code>--single-file</code> option to a generate all models in a single .ts/js file. 
 This should stop the bundle-to-folder mechanism. The name of the generated file would be simply "models.ts"
 
