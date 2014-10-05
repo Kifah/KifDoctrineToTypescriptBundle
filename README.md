@@ -155,7 +155,68 @@ alert(contact.nickName);
 <strong>Important:</strong> For this to work correctly, you need to have the 
 [JMS Serialzer Bundle](https://github.com/schmittjoh/JMSSerializerBundle) installed correctly
 
+There are cases, where you want to generate only Entites and fields, that are exposed by the JMS serializer,
+because you want to keep the rest private or hidden from other parts of your project.
 
+Let us revist the doctrine entity from earlier.
+
+``` php
+<?php
+// src/Acme/UserBundle/Entity/Contact.php
+.
+.
+use JMS\Serializer\Annotation\ExclusionPolicy;
+use JMS\Serializer\Annotation\Expose;
+.
+.
+ * @ORM\Table(name="contacts")
+  * @ExclusionPolicy("all")
+ */
+class Contact
+{
+    /**
+     * @ORM\Id
+     * @ORM\Column(type="integer")
+     * @ORM\GeneratedValue(strategy="AUTO")
+     */
+    protected $id;
+
+    /**
+     * @var string
+     * @Expose
+     * @ORM\Column(name="nick_name", type="string", length=255, nullable=true)
+     */
+    private $nickName;
+    
+}
+```
+
+Notice the annotation <code>@ExclusionPolicy("all")</code> that excludes all fields, and the annotation <code>@Expose</code>
+right over the field <code>$nickName</code>. This would generate the following Typescript file.
+
+
+``` typescript
+
+module AcmeUserBundle {
+
+
+private _nickName:string ;
+
+get nickName(){
+
+return  this._nickName;
+
+}
+
+set nickName(_nickName:string){
+
+this._nickName=_nickName;
+
+}
+
+```
+
+Notice how only the field <code>$nickName</code> was generated ,while the rest was ignored. (hidden)
 
 
 ##Todo
