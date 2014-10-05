@@ -213,4 +213,5 @@ Notice how only the field <code>$nickName</code> was generated ,while the rest w
 ##Todo
 * set a <code>--single-file</code> option to a generate all models in a single .ts/js file. 
 This should stop the bundle-to-folder mechanism. The name of the generated file would be simply "models.ts"
+* when using  <code>--exposed-only</code> option be able to disable the setters when the field is <code>@readOnly</code>
 
