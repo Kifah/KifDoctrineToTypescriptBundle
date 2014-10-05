@@ -30,9 +30,20 @@ class EntityIterator
      */
     private $singleFile;
 
-    public function __construct(EntityManager $em, $serializerExposedOnly = false, $singleFile = false)
-    {
+
+    /**
+     * @var string
+     */
+    private $destinationFolder;
+
+    public function __construct(
+        EntityManager $em,
+        $destinationFolder,
+        $serializerExposedOnly = false,
+        $singleFile = false
+    ) {
         $this->em = $em;
+        $this->destinationFolder = $destinationFolder;
         $this->serializerExposedOnly = $serializerExposedOnly;
         $this->singleFile = $singleFile;
 
@@ -69,14 +80,21 @@ class EntityIterator
         $name = $reflectionStuff->getShortName();
         $namespace = str_replace("\\", "", $reflectionStuff->getNamespaceName());
         $fields = $classMetadata->getFieldNames();
-        $file = 'generated/' . $name . '.ts';
+        $completeFolder = $this->destinationFolder . "models/";
+        if (!is_dir($completeFolder)) {
+            mkdir($completeFolder);
+        }
+        if (!is_dir($completeFolder . $namespace . '/')) {
+            mkdir($completeFolder . $namespace . '/');
+        }
+        $file = $completeFolder . $namespace . '/' . $name . '.ts';
         $content = "module $namespace {\n\r";
         $content .= "export class $name {\n\r";
 
 
         foreach ($fields as $field) {
             if (!in_array($field, $excludedFields)) {
-                $fielType = $this->typeConverter($classMetadata->getFieldMapping($field)['type']);
+                $fielType = $this->DoctrineToTypescriptTypeConverter($classMetadata->getFieldMapping($field)['type']);
                 $content .= "private _$field$fielType ;\n\r";
                 $content .= "get $field(){\n\r";
                 $content .= "return  this._$field;\n\r";
@@ -91,12 +109,13 @@ class EntityIterator
         }
         $content .= "}\n\r";
         $content .= "}";
-        echo $content;
-        //file_put_contents($file,$content);
+        echo "For Doctrine Entity:" . $classMetadata->getName();
+        echo "\n\r";
+        file_put_contents($file, $content);
 
     }
 
-    protected function typeConverter($type)
+    protected function DoctrineToTypescriptTypeConverter($type)
     {
 
         switch ($type) {
@@ -124,31 +143,45 @@ class EntityIterator
      */
     protected function handleSerializerExposed(ClassMetadata $singleMeta)
     {
-        $excludedFields = [];
-        $fields = $singleMeta->getFieldNames();
-        $annotationReader = new AnnotationReader();
-        $classAnnotation = $annotationReader->getClassAnnotation(
-            $singleMeta->getReflectionClass(),
-            ExclusionPolicy::class
-        );
-        if ($classAnnotation) {
-            $exclusionPolicy = $classAnnotation->policy;
-            if ($exclusionPolicy == 'ALL') {
-                //filter out the exposed fields only
-                foreach ($fields as $field) {
-                    $property = $singleMeta->getReflectionProperty($field);
-                    $exposeAnnotation = $annotationReader->getPropertyAnnotation($property, Expose::class);
-                    $excludeAnnotation = $annotationReader->getPropertyAnnotation($property, Exclude::class);
-                    if (($exposeAnnotation == null && $exclusionPolicy == 'ALL') || ($exclusionPolicy == 'NONE' && $excludeAnnotation != null)) {
-                        $excludedFields[] = $field;
+        //if the only-exposed option is not activatated, do normal generation
+        if ($this->serializerExposedOnly == false) {
+            $this->typeScriptCreator($singleMeta);
+
+        } else {
+
+            $excludedFields = [];
+            $fields = $singleMeta->getFieldNames();
+            $annotationReader = new AnnotationReader();
+            $classAnnotation = $annotationReader->getClassAnnotation(
+                $singleMeta->getReflectionClass(),
+                ExclusionPolicy::class
+            );
+            if ($classAnnotation) {
+                $exclusionPolicy = $classAnnotation->policy;
+                if ($exclusionPolicy == 'ALL') {
+                    //filter out the exposed fields only
+                    foreach ($fields as $field) {
+                        $property = $singleMeta->getReflectionProperty($field);
+                        $exposeAnnotation = $annotationReader->getPropertyAnnotation($property, Expose::class);
+                        $excludeAnnotation = $annotationReader->getPropertyAnnotation($property, Exclude::class);
+                        if (($exposeAnnotation == null && $exclusionPolicy == 'ALL') || ($exclusionPolicy == 'NONE' && $excludeAnnotation != null)) {
+                            $excludedFields[] = $field;
+                        }
+
                     }
 
                 }
 
+                // run the generation, only if the complete Entity is not excluded from serializiation
+                if (sizeof($excludedFields) < sizeof($fields)) {
+                    $this->typeScriptCreator($singleMeta, $excludedFields);
+                }
+
             }
+
+
         }
 
-        $this->typeScriptCreator($singleMeta, $excludedFields);
     }
 
 }
