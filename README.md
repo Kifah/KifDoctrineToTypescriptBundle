@@ -174,18 +174,13 @@ use JMS\Serializer\Annotation\Expose;
  */
 class Contact
 {
-    /**
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+.
+.
+.
 
     /**
-     * @var string
-     * @Expose
-     * @ORM\Column(name="nick_name", type="string", length=255, nullable=true)
-     */
+.     * @Expose
+.     */
     private $nickName;
     
 }
