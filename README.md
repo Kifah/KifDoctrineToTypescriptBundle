@@ -163,24 +163,20 @@ Let us revist the doctrine entity from earlier.
 ``` php
 <?php
 // src/Acme/UserBundle/Entity/Contact.php
-.
-.
+//...
 use JMS\Serializer\Annotation\ExclusionPolicy;
 use JMS\Serializer\Annotation\Expose;
-.
-.
+
  * @ORM\Table(name="contacts")
   * @ExclusionPolicy("all")
  */
 class Contact
 {
-.
-.
-.
+//...
 
     /**
-.     * @Expose
-.     */
+     * @Expose
+     */
     private $nickName;
     
 }
