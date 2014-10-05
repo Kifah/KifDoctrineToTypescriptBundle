@@ -38,6 +38,9 @@ public function registerBundles()
 
 ##Usage
 
+
+###Standard Usage
+
 * in your symfony folder use the command
 
 
