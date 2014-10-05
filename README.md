@@ -94,7 +94,7 @@ $ php app/console kif:doctrine:typescript:generate src/typscript
 we will find the following file gets generated
 
 ``` bash
-$ src/typscript/models/AcmeUserBundle/Contact.ts
+$ src/typscript/models/AcmeUserBundleEntity/Contact.ts
 ```
 
 with the content
@@ -137,7 +137,17 @@ this._nickName=_nickName;
 ```
 
 
+Now you can have access to the generated model easily in your Typescript code
 
+
+``` typescript
+
+///<reference path="models/AcmeUserBundleEntity/Contact"/>
+var contact = new AcmeUserBundleEntity.Contact();
+contact.nickName = "myNickname";
+alert(contact.nickName);
+
+```
 
 
 
