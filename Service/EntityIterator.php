@@ -16,9 +16,9 @@ class EntityIterator
 
 
     /**
-     * @var EntityManager
+     * @var ClassMetadata[]
      */
-    private $em;
+    private $allMetaData;
 
     /**
      * @var bool
@@ -37,12 +37,12 @@ class EntityIterator
     private $destinationFolder;
 
     public function __construct(
-        EntityManager $em,
+        array $allMetaData,
         $destinationFolder,
         $serializerExposedOnly = false,
         $singleFile = false
     ) {
-        $this->em = $em;
+        $this->allMetaData = $allMetaData;
         $this->destinationFolder = $destinationFolder;
         $this->serializerExposedOnly = $serializerExposedOnly;
         $this->singleFile = $singleFile;
@@ -51,11 +51,8 @@ class EntityIterator
 
     public function entityBundlesIterator()
     {
-        /**
-         * @var $singleMeta ClassMetadata
-         */
-        $allMeta = $this->em->getMetadataFactory()->getAllMetadata();
-        foreach ($allMeta as $singleMeta) {
+
+        foreach ($this->allMetaData as $singleMeta) {
             $this->handleSerializerExposed($singleMeta);
             $entities[] = $singleMeta->getName();
         }

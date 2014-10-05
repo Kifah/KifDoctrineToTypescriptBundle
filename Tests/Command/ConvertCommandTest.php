@@ -2,19 +2,88 @@
 
 
 namespace Kif\DoctrineToTypescriptBundle\Command;
+
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Tester\CommandTester;
 use Kif\DoctrineToTypescriptBundle\Command\ConvertCommand;
 
-
-class ConvertCommandTest extends \PHPUnit_Framework_TestCase
+class ConvertCommandTest extends KernelTestCase
 {
 
     /**
-     * @test
-     * @covers ConvertCommand::configure
+     * @var \Doctrine\ORM\EntityManager
      */
-    public function sourceFolderMissing()
+    private $em;
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setUp()
     {
+        self::bootKernel();
+        $this->em = static::$kernel->getContainer()
+            ->get('doctrine')
+            ->getManager()
+        ;
+    }
+
+
+    /**
+     * @test
+     * @expectedException RuntimeException
+     * @expectedExceptionMessage Not enough arguments.
+     */
+    public function executeMissingArguments()
+    {
+        $application = new Application();
+        $application->add(new ConvertCommand($this->em));
+
+        $command = $application->find('kif:doctrine:typescript:generate');
+        $commandTester = new CommandTester($command);
+        $commandTester->execute(array('command' => $command->getName()));
 
     }
 
+    /**
+     * @test
+     * @expectedException Symfony\Component\Filesystem\Exception\FileNotFoundException
+     * @expectedExceptionMessage The destination folder does not exist.
+     */
+    public function destinationFolderDoesNotExist()
+    {
+        $application = new Application();
+        $application->add(new ConvertCommand($this->em));
+
+        $command = $application->find('kif:doctrine:typescript:generate');
+        $commandTester = new CommandTester($command);
+        $commandTester->execute(
+            array('command' => $command->getName(), 'destination_folder' => 'my_test_folder/')
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function executeCorrectlyStandard()
+    {
+        $application = new Application();
+        $application->add(new ConvertCommand($this->em));
+
+        $command = $application->find('kif:doctrine:typescript:generate');
+        $commandTester = new CommandTester($command);
+        $commandTester->execute(
+            array('command' => $command->getName(), 'destination_folder' => 'my_test_folder/')
+        );
+    }
+
+
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function tearDown()
+    {
+        parent::tearDown();
+    }
 }

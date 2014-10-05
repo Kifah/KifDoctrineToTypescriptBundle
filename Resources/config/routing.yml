@@ -1,3 +1,0 @@
-kif_doctrine_to_typescript_homepage:
-    path:     /hello/{name}
-    defaults: { _controller: KifDoctrineToTypescriptBundle:Default:index }
