@@ -48,6 +48,8 @@ public function registerBundles()
 $ php app/console kif:doctrine:typescript:generate destination_folder
 ```
 
+<code>destination_folder</code> must be a writable folder.
+
 This would generate a folder <code>/models/</code> in the given destination folder, with Typescript files containing all the models
 represented in your symfony project as doctrine entities
 
