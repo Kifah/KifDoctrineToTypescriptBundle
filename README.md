@@ -190,7 +190,7 @@ right over the field <code>$nickName</code>. This would generate the following T
 
 ``` typescript
 
-module AcmeUserBundle {
+module AcmeUserBundleEntity {
 
 
 private _nickName:string ;
