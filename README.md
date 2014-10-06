@@ -104,7 +104,7 @@ with the content
 
 ``` typescript
 
-module AcmeUserBundle {
+module AcmeUserBundleEntity {
 
 export class Contact {
 
