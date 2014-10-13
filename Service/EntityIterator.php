@@ -4,7 +4,6 @@
 namespace Kif\DoctrineToTypescriptBundle\Service;
 
 use Doctrine\Common\Annotations\AnnotationReader;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use JMS\Serializer\Annotation\Exclude;
 use JMS\Serializer\Annotation\ExclusionPolicy;
@@ -75,16 +74,13 @@ class EntityIterator
 
         $reflectionStuff = new \ReflectionClass($classMetadata->getName());
         $name = $reflectionStuff->getShortName();
-        $namespace = str_replace("\\", "", $reflectionStuff->getNamespaceName());
+        $namespace = str_replace("\\", "_", $reflectionStuff->getNamespaceName());
         $fields = $classMetadata->getFieldNames();
         $completeFolder = $this->destinationFolder . "models/";
         if (!is_dir($completeFolder)) {
             mkdir($completeFolder);
         }
-        if (!is_dir($completeFolder . $namespace . '/')) {
-            mkdir($completeFolder . $namespace . '/');
-        }
-        $file = $completeFolder . $namespace . '/' . $name . '.ts';
+        $file = $completeFolder . '/' . $namespace . '_' .$name . '.ts';
         $content = "module $namespace {\n\r";
         $content .= "export class $name {\n\r";
 
