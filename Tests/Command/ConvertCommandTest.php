@@ -29,22 +29,19 @@ class ConvertCommandTest extends KernelTestCase
     public function setUp()
     {
         self::bootKernel();
-        $this->em = static::$kernel->getContainer()
-            ->get('doctrine')
-            ->getManager();
 
     }
 
 
     /**
      * @test
-     * @expectedException RuntimeException
-     * @expectedExceptionMessage Not enough arguments.
+     * @expectedException \Exception
+     * @expectedExceptionMessage No Doctrine Entities on your system.
      */
-    public function executeMissingArguments()
+    public function noDoctrineEntities()
     {
         $application = new Application();
-        $application->add(new ConvertCommand($this->em));
+        $application->add(new ConvertCommand([]));
 
         $command = $application->find('kif:doctrine:typescript:generate');
         $commandTester = new CommandTester($command);
@@ -54,13 +51,30 @@ class ConvertCommandTest extends KernelTestCase
 
     /**
      * @test
+     * @expectedException RuntimeException
+     * @expectedExceptionMessage Not enough arguments.
+     */
+    public function executeMissingArguments()
+    {
+        $application = new Application();
+        $application->add(new ConvertCommand([1]));
+
+        $command = $application->find('kif:doctrine:typescript:generate');
+        $commandTester = new CommandTester($command);
+        $commandTester->execute(array('command' => $command->getName()));
+
+    }
+
+
+    /**
+     * @test
      * @expectedException Symfony\Component\Filesystem\Exception\FileNotFoundException
      * @expectedExceptionMessage The destination folder does not exist.
      */
     public function destinationFolderDoesNotExist()
     {
         $application = new Application();
-        $application->add(new ConvertCommand($this->em));
+        $application->add(new ConvertCommand([1]));
 
         $command = $application->find('kif:doctrine:typescript:generate');
         $commandTester = new CommandTester($command);

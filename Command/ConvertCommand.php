@@ -4,7 +4,7 @@
 namespace Kif\DoctrineToTypescriptBundle\Command;
 
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use JMS\Serializer\Serializer;
 use Kif\DoctrineToTypescriptBundle\Service\EntityIterator;
 use Symfony\Component\Console\Command\Command;
@@ -18,14 +18,22 @@ use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 class ConvertCommand extends Command
 {
 
+    /**
+     * @var ClassMetadata[]
+     */
     private $allMetaData;
 
-    private $serialzer;
+    private $serializer;
 
-    public function __construct(EntityManager $entityManager, Serializer $serializer = null)
+    public function __construct(array $allMetaData, Serializer $serializer = null)
     {
-        $this->allMetaData = $entityManager->getMetadataFactory()->getAllMetadata();
-        $this->serialzer = $serializer;
+        if ($allMetaData == []) {
+            throw new \Exception(
+                'No Doctrine Entities on your system.'
+            );
+        }
+        $this->allMetaData = $allMetaData;
+        $this->serializer = $serializer;
         parent::__construct();
 
     }
@@ -70,7 +78,7 @@ class ConvertCommand extends Command
 
         if ($input->getOption('exposed-only')) {
             $output->writeln('<info>Generating only exposed entities....</info>');
-            if ($this->serialzer == null) {
+            if ($this->serializer == null) {
                 throw new ServiceNotFoundException(
                     'install the jms serializer bundle to use the --exposed-only option'
                 );

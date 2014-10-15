@@ -1,9 +1,12 @@
-services:
+parameters:
+    my_metadata_factory:   doctrine.orm.entity_manager
 
+
+services:
     kif_doctrine_to_typescript.convert_command:
         class: Kif\DoctrineToTypescriptBundle\Command\ConvertCommand
         tags:
             -  { name: console.command }
-        arguments: [ "@doctrine.orm.entity_manager","@=container.has('jms_serializer') ? container.get('jms_serializer') : null" ]
+        arguments: [ "@=service('doctrine.orm.entity_manager').getMetadataFactory().getAllMetadata()","@=container.has('jms_serializer') ? container.get('jms_serializer') : null" ]
 
 
