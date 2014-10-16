@@ -6,7 +6,8 @@ namespace Kif\DoctrineToTypescriptBundle\Command;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 use JMS\Serializer\Serializer;
-use Kif\DoctrineToTypescriptBundle\Service\EntityIterator;
+use Kif\DoctrineToTypescriptBundle\Utils\EntityIterator;
+use Kif\DoctrineToTypescriptBundle\Utils\ErrorConstants;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -75,11 +76,9 @@ class ConvertCommand extends Command
 
 
         if (!file_exists($destinationFolder)) {
-            throw new FileNotFoundException(
-                'Destination folder does not exist.'
-            );
+            throw new FileNotFoundException(ErrorConstants::CONVERT_ERROR_FOLDER_NOT_FOUND);
         } elseif (!is_writable($destinationFolder)) {
-            throw new IOException('Destination Folder is not writable.');
+            throw new IOException(ErrorConstants::CONVERT_ERROR_FOLDER_NOT_WRITABLE);
         }
 
         if (!is_dir($completeFolder)) {
@@ -90,9 +89,7 @@ class ConvertCommand extends Command
         if ($input->getOption('exposed-only')) {
             $output->writeln('<info>Generating only exposed entities....</info>');
             if ($this->serializer == null) {
-                throw new ServiceNotFoundException(
-                    'install the jms serializer bundle to use the --exposed-only option'
-                );
+                throw new ServiceNotFoundException(ErrorConstants::CONVERT_ERROR_JMS_SERIALIZER_NOT_FOUND);
             }
             $exposedOnly = true;
         }

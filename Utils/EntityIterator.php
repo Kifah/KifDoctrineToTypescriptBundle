@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Kif\DoctrineToTypescriptBundle\Service;
+namespace Kif\DoctrineToTypescriptBundle\Utils;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\Mapping\ClassMetadata;
