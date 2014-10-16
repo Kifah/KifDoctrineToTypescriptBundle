@@ -11,7 +11,6 @@ use JMS\Serializer\Annotation\Expose;
 
 class EntityIterator
 {
-    const MODELS_FOLDER = "models/";
 
 
     /**
@@ -74,22 +73,17 @@ class EntityIterator
 
         $namespace = str_replace("\\", "_", $classMetadata->getName());
         $fields = $classMetadata->getFieldNames();
-        $completeFolder = $this->destinationFolder . self::MODELS_FOLDER;
-        if (!is_dir($completeFolder)) {
-            mkdir($completeFolder);
-        }
-        $file = $completeFolder . '/' . $namespace . '.ts';
+        $file = $this->destinationFolder . '/' . $namespace . '.ts';
         $content = "module $namespace {\n\r";
         $content .= "export class $namespace {\n\r";
-
         foreach ($fields as $field) {
             if (!in_array($field, $excludedFields)) {
-                $fielType = $this->DoctrineToTypescriptTypeConverter($classMetadata->getFieldMapping($field)['type']);
-                $content .= "private _$field$fielType ;\n\r";
+                $fieldType = $this->DoctrineToTypescriptTypeConverter($classMetadata->getFieldMapping($field)['type']);
+                $content .= "private _$field$fieldType ;\n\r";
                 $content .= "get $field(){\n\r";
                 $content .= "return  this._$field;\n\r";
                 $content .= "}\n\r";
-                $content .= "set $field(_$field$fielType){\n\r";
+                $content .= "set $field(_$field$fieldType){\n\r";
                 $content .= "this._$field=_$field;\n\r";
                 $content .= "}\n\r";
 

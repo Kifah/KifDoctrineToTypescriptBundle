@@ -14,9 +14,13 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\Filesystem\Exception\FileNotFoundException;
+use Symfony\Component\Filesystem\Exception\IOException;
 
 class ConvertCommand extends Command
 {
+
+    const MODELS_FOLDER = "models/";
+
 
     /**
      * @var ClassMetadata[]
@@ -65,14 +69,21 @@ class ConvertCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $destinationFolder = $input->getArgument('destination_folder');
+        $completeFolder = $destinationFolder . self::MODELS_FOLDER;
         $exposedOnly = false;
         $generateSingleFile = false;
 
 
         if (!file_exists($destinationFolder)) {
             throw new FileNotFoundException(
-                'The destination folder does not exist.'
+                'Destination folder does not exist.'
             );
+        } elseif (!is_writable($destinationFolder)) {
+            throw new IOException('Destination Folder is not writable.');
+        }
+
+        if (!is_dir($completeFolder)) {
+            mkdir($completeFolder);
         }
 
 
@@ -87,7 +98,7 @@ class ConvertCommand extends Command
         }
 
         $output->writeln('<info>Generating Typescript....</info>');
-        $entityIterator = new EntityIterator($this->allMetaData, $destinationFolder, $exposedOnly, $generateSingleFile);
+        $entityIterator = new EntityIterator($this->allMetaData, $completeFolder, $exposedOnly, $generateSingleFile);
         $entityIterator->entityBundlesIterator();
 
 

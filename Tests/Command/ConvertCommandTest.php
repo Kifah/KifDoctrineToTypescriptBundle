@@ -69,17 +69,32 @@ class ConvertCommandTest extends KernelTestCase
     /**
      * @test
      * @expectedException Symfony\Component\Filesystem\Exception\FileNotFoundException
-     * @expectedExceptionMessage The destination folder does not exist.
+     * @expectedExceptionMessage Destination folder does not exist.
      */
     public function destinationFolderDoesNotExist()
     {
         $application = new Application();
         $application->add(new ConvertCommand([1]));
-
         $command = $application->find('kif:doctrine:typescript:generate');
         $commandTester = new CommandTester($command);
         $commandTester->execute(
             array('command' => $command->getName(), 'destination_folder' => 'my_test_folder/')
+        );
+    }
+
+    /**
+     * @test
+     * @expectedException Symfony\Component\Filesystem\Exception\IOException
+     * @expectedExceptionMessage Destination Folder is not writable.
+     */
+    public function destinationFolderNotWritable()
+    {
+        $application = new Application();
+        $application->add(new ConvertCommand([1]));
+        $command = $application->find('kif:doctrine:typescript:generate');
+        $commandTester = new CommandTester($command);
+        $commandTester->execute(
+            array('command' => $command->getName(), 'destination_folder' => '/home/')
         );
     }
 
