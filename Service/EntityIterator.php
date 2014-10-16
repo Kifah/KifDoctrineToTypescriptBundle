@@ -8,10 +8,10 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use JMS\Serializer\Annotation\Exclude;
 use JMS\Serializer\Annotation\ExclusionPolicy;
 use JMS\Serializer\Annotation\Expose;
-use ReflectionClass;
 
 class EntityIterator
 {
+    const MODELS_FOLDER = "models/";
 
 
     /**
@@ -72,18 +72,15 @@ class EntityIterator
     protected function  typeScriptCreator(ClassMetadata $classMetadata, $excludedFields = [])
     {
 
-        $reflectionStuff = new \ReflectionClass($classMetadata->getName());
-        $name = $reflectionStuff->getShortName();
-        $namespace = str_replace("\\", "_", $reflectionStuff->getNamespaceName());
+        $namespace = str_replace("\\", "_", $classMetadata->getName());
         $fields = $classMetadata->getFieldNames();
-        $completeFolder = $this->destinationFolder . "models/";
+        $completeFolder = $this->destinationFolder . self::MODELS_FOLDER;
         if (!is_dir($completeFolder)) {
             mkdir($completeFolder);
         }
-        $file = $completeFolder . '/' . $namespace . '_' .$name . '.ts';
+        $file = $completeFolder . '/' . $namespace . '.ts';
         $content = "module $namespace {\n\r";
-        $content .= "export class $name {\n\r";
-
+        $content .= "export class $namespace {\n\r";
 
         foreach ($fields as $field) {
             if (!in_array($field, $excludedFields)) {
@@ -97,8 +94,6 @@ class EntityIterator
                 $content .= "}\n\r";
 
             }
-
-
         }
         $content .= "}\n\r";
         $content .= "}";
@@ -157,7 +152,9 @@ class EntityIterator
                         $property = $singleMeta->getReflectionProperty($field);
                         $exposeAnnotation = $annotationReader->getPropertyAnnotation($property, Expose::class);
                         $excludeAnnotation = $annotationReader->getPropertyAnnotation($property, Exclude::class);
-                        if (($exposeAnnotation == null && $exclusionPolicy == 'ALL') || ($exclusionPolicy == 'NONE' && $excludeAnnotation != null)) {
+                        if (($exposeAnnotation == null && $exclusionPolicy == 'ALL')
+                            || ($exclusionPolicy == 'NONE' && $excludeAnnotation != null)
+                        ) {
                             $excludedFields[] = $field;
                         }
 
