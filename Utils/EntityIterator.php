@@ -11,8 +11,6 @@ use JMS\Serializer\Annotation\Expose;
 
 class EntityIterator
 {
-
-
     /**
      * @var ClassMetadata[]
      */

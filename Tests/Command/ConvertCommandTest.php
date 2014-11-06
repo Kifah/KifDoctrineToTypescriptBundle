@@ -82,7 +82,7 @@ class ConvertCommandTest extends KernelTestCase
         );
     }
 
-    
+
     /**
      * @test
      * @expectedException Symfony\Component\Filesystem\Exception\IOException
